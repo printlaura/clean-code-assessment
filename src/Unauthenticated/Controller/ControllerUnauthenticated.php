@@ -167,15 +167,6 @@ class ControllerUnauthenticated
     }
 
 
-    /**
-     * Gets Actions from action dictionary using http pattern and action name
-     *
-     * @param Request $parsedRequest  request that was parsed
-     * @param array   $postActionDict dictionary of post actions
-     *
-     * @return mixed new Action::class
-     * @throws RequestInValidException when $pattern is not POST or $actionName is not part of the action dictionary
-     */
     public static function getActionFromJSON(Request $parsedRequest, array $postActionDict)
     {
         $actionDict = $postActionDict;
@@ -222,15 +213,6 @@ class ControllerUnauthenticated
     }
 
 
-    /**
-     *
-     * @param LoggerInterface $logger  logger reference
-     * @param Request         $request
-     *
-     * @return Action
-     * @throws HttpMethodNotAllowedException
-     * @throws RequestInValidException on unknown path
-     */
     private static function getAction(LoggerInterface $logger, Request $request): Action
     {
         $httpMethod = $request->getMethod();
