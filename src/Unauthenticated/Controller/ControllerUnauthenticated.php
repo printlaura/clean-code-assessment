@@ -234,23 +234,19 @@ class ControllerUnauthenticated
     private static function getAction(LoggerInterface $logger, Request $request): Action
     {
         $httpMethod = $request->getMethod();
-        if ($httpMethod === "GET") {
-            $actionDict = self::GET_ACTION_DICT;
-        } else if ($httpMethod === "POST") {
-            $actionDict = self::POST_ACTION_DICT;
-        } else if ($httpMethod === "DELETE") {
-            $actionDict = self::DELETE_ACTION_DICT;
-        } else {
-            throw new HttpMethodNotAllowedException($request);
-        }
 
+        $actionDict = match ($httpMethod) {
+            "GET" => self::GET_ACTION_DICT,
+            "POST" => self::POST_ACTION_DICT,
+            "DELETE" => self::DELETE_ACTION_DICT,
+            default => throw new HttpMethodNotAllowedException($request),
+        };
 
         $actionPath = str_replace("/".RelativePaths::getRootDirName()."/api/", "", $request->getUri()->getPath());
-        if (isset($actionDict[$actionPath]) === false) {
+        if (!isset($actionDict[$actionPath])) {
             throw new RequestInValidException("Action path '$actionPath' unknown");
         }
         $logger->debug($actionDict[$actionPath]);
         return new $actionDict[$actionPath]();
     }
-
 }
