@@ -11,10 +11,12 @@ use App\Unauthenticated\Exceptions\MediaUnknownException;
 use App\Unauthenticated\Exceptions\RequestInValidException;
 use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpMethodNotAllowedException;
 use App\Unauthenticated\Exceptions\MediaNotInFolderException;
+use Slim\Logger;
 
 /**
  * Controller to route requests to the responsible action.
@@ -24,7 +26,6 @@ use App\Unauthenticated\Exceptions\MediaNotInFolderException;
  */
 class ControllerUnauthenticated
 {
-
     const DELETE_ACTION_DICT = [];
     const GET_ACTION_DICT    = [
         // prices
@@ -40,13 +41,6 @@ class ControllerUnauthenticated
     ];
 
 
-    /**
-     * @param $logger
-     * @param Request  $request
-     * @param Response $response
-     *
-     * @return     Response
-     */
     public static function executeAction($logger, Request $request, Response $response): Response
     {
         $logger->debug("Received Request: ".$request->getMethod()." ".$request->getUri()->getPath());
@@ -56,16 +50,9 @@ class ControllerUnauthenticated
         } catch (Exception $exception) {
             return Action::respondWithError($logger, $response, new ActionError(ActionError::VALIDATION_ERROR, $exception->getMessage()), 400);
         }
-        // parse request JSON
-        if ($request->getMethod() === "POST") {
-            try {
-                $requestWithParsedBody = self::parseRequestJSON($request);
-            } catch (Exception $exception) {
-                return Action::respondWithError($logger, $response, new ActionError(ActionError::VALIDATION_ERROR, $exception->getMessage()), 400);
-            }
-        } else {
-            $requestWithParsedBody = $request->withParsedBody(null);
-        }
+
+        $requestWithParsedBody = self::getRequestWithParsedBody($request, $response, $logger);
+
         // execute action
         try {
             $response = $action->action($logger, $requestWithParsedBody, $response);
@@ -87,6 +74,21 @@ class ControllerUnauthenticated
         // response is 200
     }
 
+
+    public static function getRequestWithParsedBody(Request $request, Response $response, LoggerInterface $logger): ServerRequestInterface
+    {
+        if ($request->getMethod() === "POST") {
+            try {
+                $requestWithParsedBody = self::parseRequestJSON($request);
+            } catch (Exception $exception) {
+                throw Action::respondWithError($logger, $response, new ActionError(ActionError::VALIDATION_ERROR, $exception->getMessage()), 400);
+            }
+        } else {
+            $requestWithParsedBody = $request->withParsedBody(null);
+        }
+
+        return $requestWithParsedBody;
+    }
 
     /**
      * @param LoggerInterface $logger   logger reference
@@ -189,14 +191,6 @@ class ControllerUnauthenticated
     }
 
 
-    /**
-     *
-     * @param Request $request request that will be parsed
-     *
-     * @return Request parsed request
-     *
-     * @throws Exception on either failed decode json or content-type not "application/json"
-     */
     public static function parseRequestJSON(Request $request): Request
     {
         $contentType = $request->getHeaderLine('Content-Type');
@@ -258,6 +252,5 @@ class ControllerUnauthenticated
         $logger->debug($actionDict[$actionPath]);
         return new $actionDict[$actionPath]();
     }
-
 
 }
