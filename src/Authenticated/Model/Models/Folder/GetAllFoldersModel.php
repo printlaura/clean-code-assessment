@@ -183,12 +183,13 @@ class GetAllFoldersModel extends Model
         $queryBuilder->andWhereEqualsBool("web_lb_folder_user.visible", true);
         $queryBuilder->andWhereEqualsFunc("web_lb_folder_user.folder_id", "web_lb_folder.id");
 
-        if ($sortBy === 'name') {
-            $queryBuilder->sort("NAME $sortOrder");
-        } else if ($sortBy === 'update_date') {
-            $queryBuilder->sort("web_lb_folder.updated $sortOrder");
-        } else {
-            $queryBuilder->sort("NAME $sortOrder");
+        switch ($sortBy) {
+            case 'update_date':
+                $queryBuilder->sort("web_lb_folder.updated $sortOrder");
+                break;
+            default:
+                $queryBuilder->sort("NAME $sortOrder");
+                break;
         }
 
         $queryBuilder->limitOffset($limit, $offset);
