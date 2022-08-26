@@ -26,6 +26,7 @@ class GetAllFoldersModel extends Model
     }
 
 
+    //this method is not respecting the SRP
     /**
      * @param int    $userId    user reference, which folders will be returned
      * @param string $sortBy    column to sort by must be one of 'name', 'update_date'
