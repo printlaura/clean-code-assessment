@@ -14,25 +14,12 @@ use App\Unauthenticated\Model\Models\Media\PreviewModel;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
-/**
- * Folder GetAllFolderInfosModel
- */
+
 class GetAllFoldersModel extends Model
 {
 
-    /**
-     * Variable for the logger
-     *
-     * @var LoggerInterface
-     */
     private LoggerInterface $logger;
-    
 
-    /**
-     * Constructor for initializing the logger
-     *
-     * @param LoggerInterface $logger Logger-Variable
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -171,8 +158,6 @@ class GetAllFoldersModel extends Model
 
 
     /**
-     * Manage the generation of the SQL
-     *
      * @param int    $userId    user that retrieves folders
      * @param string $sortBy    sorting option
      * @param string $sortOrder sorting direction
@@ -213,8 +198,6 @@ class GetAllFoldersModel extends Model
 
 
     /**
-     * Returns the amount of folders the user owns or is a member of.
-     *
      * @param int $userId
      *
      * @return int
