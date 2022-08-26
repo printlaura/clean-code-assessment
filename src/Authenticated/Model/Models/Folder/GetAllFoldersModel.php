@@ -98,14 +98,7 @@ class GetAllFoldersModel extends Model
      */
     private function getImagePreviewsInMultipleFolders(Database $database, array $folderIds, string $language): array
     {
-        $queryBuilder = new QueryBuilderSelect();
-        $queryBuilder->select("folder_id AS folderid", "media_id AS mediaid", "type", "source", "sort");
-        $queryBuilder->from("web_lb_folder_media");
-        $queryBuilder->andWhereEqualsBool("visible", true);
-        $queryBuilder->andWhereIsInIntArray("folder_id", $folderIds);
-        $queryBuilder->sort("folder_id", "sort");
-
-        $results = $database->queryPreparedStatement($queryBuilder);
+        $results = self::queryMultipleFoldersMediaByFolderIds($database, $folderIds);
 
         $folderMediaRefArrayDict = [];
         foreach ($results as $result) {
@@ -152,6 +145,17 @@ class GetAllFoldersModel extends Model
         return $folderPreviewsDict;
     }
 
+    public static function queryMultipleFoldersMediaByFolderIds(Database $database, array $folderIds): array
+    {
+        $queryBuilder = new QueryBuilderSelect();
+        $queryBuilder->select("folder_id AS folderid", "media_id AS mediaid", "type", "source", "sort");
+        $queryBuilder->from("web_lb_folder_media");
+        $queryBuilder->andWhereEqualsBool("visible", true);
+        $queryBuilder->andWhereIsInIntArray("folder_id", $folderIds);
+        $queryBuilder->sort("folder_id", "sort");
+
+        return $database->queryPreparedStatement($queryBuilder);
+    }
 
     /**
      * @param int    $userId    user that retrieves folders
