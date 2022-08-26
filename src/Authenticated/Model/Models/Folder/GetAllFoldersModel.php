@@ -27,8 +27,6 @@ class GetAllFoldersModel extends Model
 
 
     /**
-     * Read all user folders from the DB
-     *
      * @param int    $userId    user reference, which folders will be returned
      * @param string $sortBy    column to sort by must be one of 'name', 'update_date'
      * @param string $sortOrder asc or desc
@@ -38,7 +36,7 @@ class GetAllFoldersModel extends Model
      *
      * @return FolderModel[]
      */
-    public function getAllFolders(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset, string $language): array
+    public function getAllFoldersByUserId(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset, string $language): array
     {
         $sqlFolders = self::generateSql($userId, $sortBy, $sortOrder, $limit, $offset);
         $database   = new Database($this->logger);
@@ -100,7 +98,7 @@ class GetAllFoldersModel extends Model
      *
      * @return array dict with folderId as key and Preview[] as values
      */
-    private function getMultiplePreviews(Database $database, array $folderIds, string $language): array
+    private function getImagePreviewsInMultipleFolders(Database $database, array $folderIds, string $language): array
     {
         $queryBuilder = new QueryBuilderSelect();
         $queryBuilder->select("folder_id AS folderid", "media_id AS mediaid", "type", "source", "sort");
@@ -109,10 +107,10 @@ class GetAllFoldersModel extends Model
         $queryBuilder->andWhereIsInIntArray("folder_id", $folderIds);
         $queryBuilder->sort("folder_id", "sort");
 
-        $resultMedias = $database->queryPreparedStatement($queryBuilder);
+        $results = $database->queryPreparedStatement($queryBuilder);
 
         $folderMediaRefArrayDict = [];
-        foreach ($resultMedias as $result) {
+        foreach ($results as $result) {
             if (isset($folderMediaRefArrayDict[$result->folderid]) === true) {
                 $mediaRefs = $folderMediaRefArrayDict[$result->folderid];
             } else {
@@ -166,7 +164,7 @@ class GetAllFoldersModel extends Model
      *
      * @return QueryBuilderSelect
      */
-    private static function generateSql(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset): QueryBuilderSelect
+    private static function generateSqlQuery(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset): QueryBuilderSelect
     {
         $queryBuilder = new QueryBuilderSelect();
         $queryBuilder->select(
@@ -197,11 +195,6 @@ class GetAllFoldersModel extends Model
     }
 
 
-    /**
-     * @param int $userId
-     *
-     * @return int
-     */
     public function getFolderCount(int $userId): int
     {
         $queryBuilder = new QueryBuilderSelect();
