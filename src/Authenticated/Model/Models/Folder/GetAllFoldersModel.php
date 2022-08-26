@@ -88,7 +88,9 @@ class GetAllFoldersModel extends Model
         return $folders;
     }
 
-
+    // bad smells:
+    // 1)confusing variable names (similar names and non easy-readable)
+    // 2)too long method. too much logic within one same method. very hard to go through.
     /**
      * @param Database $database  database connection
      * @param int[]    $folderIds
