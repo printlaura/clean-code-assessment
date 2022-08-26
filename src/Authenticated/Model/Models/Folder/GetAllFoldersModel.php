@@ -90,8 +90,6 @@ class GetAllFoldersModel extends Model
 
 
     /**
-     * Get the previews of images in multiple folders
-     *
      * @param Database $database  database connection
      * @param int[]    $folderIds
      * @param string   $language  'en' or default (de)
@@ -111,12 +109,12 @@ class GetAllFoldersModel extends Model
 
         $folderMediaRefArrayDict = [];
         foreach ($results as $result) {
-            if (isset($folderMediaRefArrayDict[$result->folderid]) === true) {
+            if (!isset($folderMediaRefArrayDict[$result->folderid])) {
                 $mediaRefs = $folderMediaRefArrayDict[$result->folderid];
             } else {
                 $mediaRefs = [];
             }
-            if (empty($mediaRefs) === true || count($mediaRefs) < 4) {
+            if (empty($mediaRefs) || count($mediaRefs) < 4) {
                 $mediaRefs[] = new MediaReferenceModel($result->source, $result->mediaid, $result->type);
             }
             $folderMediaRefArrayDict[$result->folderid] = $mediaRefs;
@@ -124,7 +122,7 @@ class GetAllFoldersModel extends Model
 
         $folderPreviewsDict = [];
         foreach ($folderIds as $folderId) {
-            if (isset($folderMediaRefArrayDict[$folderId]) === true) {
+            if (!isset($folderMediaRefArrayDict[$folderId])) {
                 $mediaRefs = $folderMediaRefArrayDict[$folderId];
             } else {
                 $mediaRefs = [];
