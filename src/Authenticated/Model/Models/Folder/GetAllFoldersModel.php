@@ -102,7 +102,7 @@ class GetAllFoldersModel extends Model
 
         $folderMediaRefArrayDict = [];
         foreach ($results as $result) {
-            if (!isset($folderMediaRefArrayDict[$result->folderid])) {
+            if (isset($folderMediaRefArrayDict[$result->folderid])) {
                 $mediaRefs = $folderMediaRefArrayDict[$result->folderid];
             } else {
                 $mediaRefs = [];
