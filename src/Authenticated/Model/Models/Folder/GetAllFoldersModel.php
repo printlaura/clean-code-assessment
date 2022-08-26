@@ -38,7 +38,7 @@ class GetAllFoldersModel extends Model
      */
     public function getAllFoldersByUserId(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset, string $language): array
     {
-        $sqlFolders = self::generateSqlQuery($userId, $sortBy, $sortOrder, $limit, $offset);
+        $sqlFolders = self::queryFoldersByUserId($userId, $sortBy, $sortOrder, $limit, $offset);
         $database   = new Database($this->logger);
         $results    = $database->queryPreparedStatement($sqlFolders);
         $database->close();
@@ -164,7 +164,7 @@ class GetAllFoldersModel extends Model
      *
      * @return QueryBuilderSelect
      */
-    private static function generateSqlQuery(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset): QueryBuilderSelect
+    private static function queryFoldersByUserId(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset): QueryBuilderSelect
     {
         $queryBuilder = new QueryBuilderSelect();
         $queryBuilder->select(
