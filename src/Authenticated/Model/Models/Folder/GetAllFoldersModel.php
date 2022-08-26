@@ -38,7 +38,7 @@ class GetAllFoldersModel extends Model
      */
     public function getAllFoldersByUserId(int $userId, string $sortBy, string $sortOrder, int $limit, int $offset, string $language): array
     {
-        $sqlFolders = self::generateSql($userId, $sortBy, $sortOrder, $limit, $offset);
+        $sqlFolders = self::generateSqlQuery($userId, $sortBy, $sortOrder, $limit, $offset);
         $database   = new Database($this->logger);
         $results    = $database->queryPreparedStatement($sqlFolders);
         $database->close();
@@ -53,7 +53,7 @@ class GetAllFoldersModel extends Model
         }
         $descriptionsDict  = DescriptionModel::getMultipleFolderDescriptions($this->logger, $folderIds);
         $folderDetailsDict = GetAllFolderInfosModel::getMultipleFolderInfoDetails($this->logger, $folderIds);
-        $previewsDict      = $this->getMultiplePreviews($database, $folderIds, $language);
+        $previewsDict      = $this->getImagePreviewsInMultipleFolders($database, $folderIds, $language);
         $mediaCountDict    = GetAllFolderInfosModel::getMultipleFoldersMediaCount($this->logger, $folderIds);
 
         foreach ($results as $result) {
